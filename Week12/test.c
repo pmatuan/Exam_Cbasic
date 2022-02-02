@@ -8,14 +8,14 @@
 #include <string.h>
 
 const char *cases[] = {
-  "./prog p1k.txt p1k-o10.txt",
-  "./prog p10k.txt p10k-o100.txt",
-  "./prog p100k.txt p100k-o1k.txt",
-  "./prog p1m.txt p1m-o10k.txt",
-  "valgrind ./prog p1k.txt p1k-o10.txt",
-  "valgrind ./prog p10k.txt p10k-o100.txt",
-  "valgrind ./prog p100k.txt p100k-o1k.txt",
-  "valgrind ./prog p1m.txt p1m-o10k.txt"
+  "./prog_gvec p1k.txt p1k-o10.txt",
+  "./prog_array p1k.txt p1k-o10.txt",
+  "./prog_gvec p10k.txt p10k-o100.txt",
+  "./prog_array p10k.txt p10k-o100.txt",
+  "./prog_gvec p100k.txt p100k-o1k.txt",
+  "./prog_array p100k.txt p100k-o1k.txt",
+  "./prog_gvec p1m.txt p1m-o10k.txt",
+  "./prog_array p1m.txt p1m-o10k.txt"
 };
 
 char *real_command(const char *cmd) {
