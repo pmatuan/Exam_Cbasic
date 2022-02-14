@@ -8,7 +8,7 @@
 #include <string.h>
 
 const char *cases[] = {
-  "./prog BongDa.txt KetQua.txt"
+  "valgrind ./prog BongDa.txt KetQua.txt"
 };
 
 char *real_command(const char *cmd) {

@@ -63,6 +63,7 @@ int main(int argc, char *argv[]){
             rbm_traverse(k, v, tree){
                 printf("%s %ld\n", k->s, v->l);
             }
+            gvec_free(vec);
         }
         else if(choice == 5){
             FILE *out = fopen(argv[2], "w+");
@@ -72,6 +73,8 @@ int main(int argc, char *argv[]){
             fclose(out);
         }
     }
+    free(tmp);
     rbm_free(tree);
     fclose(f);
+    return 0;
 }
