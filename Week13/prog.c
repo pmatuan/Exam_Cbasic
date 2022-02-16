@@ -1,4 +1,5 @@
 #include "all.c"
+#include "io.h"
 #define strequal(s1,s2) (strcmp(s1,s2) == 0)
 typedef char string[21];
 /*Dùng biến toàn cục để đỡ truyền thêm vào các hàm*/
@@ -115,6 +116,7 @@ void f3(){
 int main(int argc, char *argv[]){
     FILE *f = fopen(argv[argc-1], "r");
     fscanf(f, "%d", &n);
+    id = malloc(n*sizeof(string));
     company = malloc(n*sizeof(string));
     for(int i=0; i<n; i++){
         fscanf(f, "%s %s",id[i],company[i]);
