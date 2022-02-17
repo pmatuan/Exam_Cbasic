@@ -1,3 +1,4 @@
-Admin   Admin12 0
-Linhnv  linh123  9
-Phongph phong12 8.5
+Admin  Admin12  0.000000
+Linhnv  linh_123  9.000000
+Phongph  phong12  8.500000
+Quangnv  123455  8.500000
