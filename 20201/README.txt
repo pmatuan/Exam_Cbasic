@@ -1,0 +1,1 @@
+gcc -o prog prog.c -I /media/pmat/Data/School/Cbasic/cgen
