@@ -12,9 +12,12 @@ void menu(){
     printf("5. Xuat file\n");
     printf("6. Thoat\n");
 }
+void freeS(gtype s){
+	free (s.s);
+} 
 int main(int argc, char *argv[]){
     FILE *f = fopen(argv[1], "r");
-    rbm_t tree = rbm_create(gtype_cmp_s, NULL, NULL);
+    rbm_t tree = rbm_create(gtype_cmp_s, freeS, NULL);
     while(choice!=6){
         menu();
         printf("Nhap vao lua chon cua ban: ");

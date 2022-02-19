@@ -10,7 +10,10 @@
 const char *cases[] = {
   "./prog f1 c222222 inp1m.txt",
   "./prog f2 h111111 inp1m.txt",
-  "./prog f3 inp1m.txt"
+  "./prog f3 inp1m.txt",
+  "valgrind ./prog f1 c222222 inp1m.txt",
+  "valgrind ./prog f2 h111111 inp1m.txt",
+  "valgrind ./prog f3 inp1m.txt"
 };
 
 char *real_command(const char *cmd) {
