@@ -2,131 +2,121 @@
 #include "ext/io.h"
 #include "limits.h"
 typedef char string[4];
-char *line = NULL;
-int choice = -1, n;
 typedef struct CK_t{
     string id;
     double open;
     double close;
 }*CK;
+int n, choice = -1;
 CK ck;
+char *line = NULL;
 void menu(){
-    printf("1. Doc file\n");
-    printf("2. Tim kiem theo ma chung khoan\n");
-    printf("3. Tim kiem nhung ma chung khoan co xu huong tang\n");
-    printf("4. Tim ma so co so ngay tang lon nhat\n");
-    printf("5. Thoat\n");
+    printf("1. Đọc file\n");
+    printf("2. Tìm kiếm theo mã chứng khoán\n");
+    printf("3. Tìm kiếm những mã chứng khoán có xu hướng tăng\n");
+    printf("4. Tìm mã có số ngày tăng lớn nhất\n");
+    printf("5. Thoát chương trình\n");
 }
-int main(int argc, char *argv[]){
+
+int main(){
     gvec_t vec = gvec_create(10, gtype_free_v);
     rbm_t tree = rbm_create(gtype_cmp_s, NULL, NULL);
+    FILE *f = fopen("data.txt", "r");
+    fscanf(f, "%d", &n);
     while(choice != 5){
         menu();
-        printf("Nhap vao lua chon cua ban: ");
-        scanf("%d",&choice);
+        printf("Nhập vào lựa chọn của bạn: ");
+        scanf("%d", &choice);
         clear_stdin();
         if(choice == 1){
-            FILE *f = fopen(argv[1], "r");
-            fscanf(f, "%d", &n);
-            for(int i=0; i<10; i++){
-                for(int j=0; j<n; j++){
-                    ck = malloc(sizeof(struct CK_t));
-                    fscanf(f, "%s   %lf %lf", ck->id, &ck->open, &ck->close);
-                    gvec_append(vec, gtype_v(ck));
-                }
+            for(int i=0; i<n*10; i++){
+                ck = malloc(sizeof(struct CK_t));
+                fscanf(f, "%s %lf %lf", ck->id, &ck->open, &ck->close);
+                gvec_append(vec, gtype_v(ck));
             }
             gvec_traverse(cur, vec){
                 ck = cur->v;
                 rbm_ires res = rbm_insert(tree, gtype_s(ck->id), gtype_d(ck->close - ck->open));
                 if(!res.inserted){
-                    res.value->d += ck->close - ck->open;
+                    res.value->d += (ck->close - ck->open);
                 }
             }
             rbm_traverse(k, v, tree){
-                printf("%s  %.3lf\n", k->s, v->d/10);
+                printf("%s %.3lf\n", k->s, v->d/10);
             }
-            fclose(f);
         }
         else if(choice == 2){
-            double max = (double)INT_MIN, min = (double)INT_MAX;
-            printf("Nhap vao ma co phieu: ");
+            double max = (double) INT_MIN;
+            double min = (double) INT_MAX;
+            printf("Nhập vào mã cổ phiếu: ");
             cgetline(&line, 0, stdin);
             remove_tail_lf(line);
-            if(rbm_value(tree, gtype_s(line)) == NULL){
-                printf("Khong tim thay ma chung khoan\n");
+            gvec_traverse(cur, vec){
+                ck = cur->v;
+                if(!strcmp(ck->id, line)){
+                    if(ck->close > max) max = ck->close;
+                    if(ck->close < min) min = ck->close;
+                }
+            }
+            if(max == INT_MIN){
+                printf("Không tìm thấy\n");
             }
             else{
-                gvec_traverse(cur, vec){
-                    ck = cur->v;
-                    if(!strcmp(line, ck->id)){
-                        if(max < ck->close){
-                            max = ck->close;
-                        }
-                        if(min > ck->close){
-                            min = ck->close;
-                        }
-                    }
-                }
-                printf("%s co gia dong cua cao nhat la: %.3lf\n", line, max);
-                printf("%s co gia dong cua thap nhat la: %.3lf\n", line, min);
+                printf("Giá đóng cửa cao nhất: %.3lf\n", max);
+                printf("Giá đóng cửa thấp nhất: %.3lf\n", min);
             }
         }
         else if(choice == 3){
             int count = 0;
-            hmap_t h = hmap_create(gtype_hash_s,gtype_cmp_s,NULL,NULL);
-            gvec_traverse(cur,vec){
+            hmap_t map = hmap_create(gtype_hash_s, gtype_cmp_s, NULL, NULL);
+            gvec_traverse(cur, vec){
+                if(count == 2*n) break;
                 ck = cur->v;
                 if(ck->close > ck->open){
-                    hmap_ires res = hmap_insert(h,gtype_s(ck->id),gtype_l(1));
+                    hmap_ires res = hmap_insert(map, gtype_s(ck->id), gtype_l(1));
                     if(!res.inserted){
-                        if(ck->close > ck->open) res.value->l++;
+                        res.value->l++;
                     }
                 }
                 count++;
-                if(count==n*2) break;
             }
-            hmap_traverse(key,val,h){
-                if(val->l==2){
-                    printf("%s\t",key->s);
-                    break;
+            hmap_traverse(k, v, map){
+                if(v->l == 2){
+                    printf("%s ", k->s);
                 }
             }
             printf("\n");
-            hmap_free(h);
+            hmap_free(map);
         }
         else if(choice == 4){
             int max = INT_MIN;
-            gvec_t vec_tmp = gvec_create(10, NULL);
-            hmap_t hmap = hmap_create(gtype_hash_s, gtype_cmp_s, NULL, NULL);
+            hmap_t map = hmap_create(gtype_hash_s, gtype_cmp_s, NULL, NULL);
             gvec_traverse(cur, vec){
                 ck = cur->v;
-                if(ck->close > ck->open){
-                    hmap_ires res = hmap_insert(hmap, gtype_s(ck->id), gtype_l(1));
+                 if(ck->close > ck->open){
+                    hmap_ires res = hmap_insert(map, gtype_s(ck->id), gtype_l(1));
                     if(!res.inserted){
                         res.value->l++;
                     }
                 }
             }
-            hmap_traverse(k, v, hmap){
+            hmap_traverse(k, v, map){
                 if(max < v->l) max = v->l;
             }
-            printf("So ngay lon nhat: %d\n", max);
-            hmap_traverse(k, v, hmap){
+            printf("Số ngày tăng lớn nhất: %d\n", max);
+            hmap_traverse(k, v, map){
                 if(max == v->l){
-                    gvec_append(vec_tmp, gtype_s(k->s));
+                    printf("%s ", k->s);
                 }
             }
-            gvec_traverse(cur, vec_tmp){
-                printf("%s ", cur->s);
-            }
             printf("\n");
-            gvec_free(vec_tmp);
-            hmap_free(hmap);
+            hmap_free(map);
         }
-        else if(choice == 5) printf("Tac gia: Phan Minh Anh Tuan - 20205227\n");
+        else if(choice == 5) printf("Phan Minh Anh Tuấn - 20205227 - Sửa lại lỗi lầm hôm thi CK :((\n");
     }
-    free(line);
-    gvec_free(vec);
+    fclose(f);
     rbm_free(tree);
+    gvec_free(vec);
+    free(line);
     return 0;
 }
